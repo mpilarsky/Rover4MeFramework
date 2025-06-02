@@ -31,12 +31,12 @@ class UserController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        // Sprawdzenie, czy wszystkie wymagane dane zostały dostarczone
+
         if (!isset($data['email'], $data['password'], $data['name'], $data['surname'], $data['age'])) {
             return $this->json(['error' => 'Missing required fields'], 400);
         }
 
-        // Sprawdzanie, czy użytkownik o takim e-mailu już istnieje
+
         if ($this->userRepository->findOneBy(['email' => $data['email']])) {
             return $this->json(['error' => 'Email already in use'], 400);
         }
@@ -57,22 +57,22 @@ class UserController extends AbstractController
     #[Route('/login', methods: ['POST'])]
     public function login(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
-        // Sesja uzyskana za pomocą RequestStack
+
         $session = $this->requestStack->getSession();
 
         $data = json_decode($request->getContent(), true);
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
 
-        // Pobierz użytkownika na podstawie adresu e-mail
+
         $user = $this->userRepository->findOneBy(['email' => $email]);
 
-        // Sprawdź, czy użytkownik istnieje i czy hasło jest poprawne
+
         if (!$user || !$passwordHasher->isPasswordValid($user, $password)) {
             return $this->json(['error' => 'Invalid credentials'], 401);
         }
 
-        // Ustaw użytkownika w sesji
+
         $session->set('user', $user->getId());
 
         return $this->json([
@@ -87,7 +87,7 @@ class UserController extends AbstractController
     #[Route('/logout', methods: ['POST'])]
     public function logout(): JsonResponse
     {
-        // Usuwamy użytkownika z sesji
+
         $this->session->remove('user');
 
         return $this->json(['message' => 'Logged out successfully']);

@@ -11,7 +11,6 @@ class Reservation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
-    #[Groups(['reservation:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -19,35 +18,27 @@ class Reservation
     private User $user;
 
     #[ORM\Column(type: "string", length: 255)]
-    #[Groups(['reservation:read'])]
     private string $name;
 
     #[ORM\Column(type: "string", length: 255)]
-    #[Groups(['reservation:read'])]
     private string $location;
 
     #[ORM\Column(type: "string", length: 50)]
-    #[Groups(['reservation:read'])]
     private string $frame_size;
 
     #[ORM\Column(type: "string", length: 10)]
-    #[Groups(['reservation:read'])]
     private string $theme;
 
     #[ORM\Column(type: "date")]
-    #[Groups(['reservation:read'])]
     private \DateTimeInterface $reservation_date;
 
     #[ORM\Column(type: "time")]
-    #[Groups(['reservation:read'])]
     private \DateTimeInterface $start_time;
 
     #[ORM\Column(type: "time")]
-    #[Groups(['reservation:read'])]
     private \DateTimeInterface $end_time;
 
     #[ORM\Column(type: "string", length: 20)]
-    #[Groups(['reservation:read'])]
     private string $bike_type;
 
     public function getId(): ?int { return $this->id; }
