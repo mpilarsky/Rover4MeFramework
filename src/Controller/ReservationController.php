@@ -31,18 +31,16 @@ class ReservationController extends AbstractController
     }
 
     #[Route('/reservations', methods: ['GET'])]
-    public function getReservations(): JsonResponse
+    public function getReservations(Request $request): JsonResponse
     {
-		/** @var User $user */
-		//$user = $this->getUser();
+		$userId = $request->query->get('user_id');
+		$user = $this->userRepository->find($userId);
 
-		//if (!$user) {
-		//	return $this->json(['error' => 'Unauthorized'], 401);
-		//}
+		if (!$user) {
+			return $this->json(['error' => 'Unauthorized'], 401);
+		}
 
-		// Pobierz rezerwacje tylko dla zalogowanego użytkownika
-		//$reservations = $this->reservationRepository->findBy(['user' => $user]);
-		$reservations = $this->reservationRepository->findAll();
+		$reservations = $this->reservationRepository->findBy(['user' => $user]);
         $data = [];
 
 		foreach ($reservations as $reservation) {

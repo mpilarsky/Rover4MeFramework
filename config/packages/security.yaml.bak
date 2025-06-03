@@ -22,9 +22,9 @@ security:
                 login_path: login  # Ścieżka do formularza logowania
                 check_path: login  # Ścieżka do weryfikacji logowania
                 default_target_path: /  # Domyślna ścieżka po zalogowaniu
-           # logout:
-             #   path: /logout  # Ścieżka wylogowania
-             #   target: /  # Ścieżka po wylogowaniu
+            logout:
+                path: /logout  # Ścieżka wylogowania
+                target: /  # Ścieżka po wylogowaniu
             # Możesz dodać inne metody uwierzytelniania, jak JWT, API tokens, itp.
 
     access_control:

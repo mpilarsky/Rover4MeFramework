@@ -88,8 +88,8 @@ class UserController extends AbstractController
 	public function logout(Request $request): JsonResponse
 	{
 		$session = $this->requestStack->getSession();
-		$session->remove('user'); // usuwa konkretny klucz z sesji
-		$session->invalidate();   // opcjonalnie: usuwa całą sesję
+		$session->remove('user');
+		$session->invalidate();
 
 		return $this->json(['message' => 'Logged out successfully']);
 	}
