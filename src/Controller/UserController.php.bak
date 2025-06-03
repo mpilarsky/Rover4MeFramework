@@ -11,8 +11,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Attributes as OA;
 
-#[Route('/api')]
+#[Route('/api/v1')]
 class UserController extends AbstractController
 {
     private UserRepository $userRepository;
@@ -25,6 +27,29 @@ class UserController extends AbstractController
         $this->entityManager = $entityManager;
         $this->requestStack = $requestStack;
     }
+
+	#[OA\Post(
+    path: '/api/v1/signup',
+    summary: 'Rejestracja nowego użytkownika',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ["email", "password", "name", "surname", "age"],
+            type: "object",
+            properties: [
+                new OA\Property(property: "email", type: "string", format: "email"),
+                new OA\Property(property: "password", type: "string"),
+                new OA\Property(property: "name", type: "string"),
+                new OA\Property(property: "surname", type: "string"),
+                new OA\Property(property: "age", type: "integer")
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(response: 201, description: "User registered successfully"),
+        new OA\Response(response: 400, description: "Missing required fields or email already in use")
+    ]
+	)]
 
     #[Route('/signup', methods: ['POST'])]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
@@ -54,82 +79,90 @@ class UserController extends AbstractController
         return $this->json(['message' => 'User registered successfully']);
     }
 
-    #[Route('/login', methods: ['POST'])]
-    public function login(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
-    {
+#[OA\Post(
+    path: '/api/v1/login',
+    summary: 'Logowanie użytkownika',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ["email", "password"],
+            type: "object",
+            properties: [
+                new OA\Property(property: "email", type: "string", format: "email"),
+                new OA\Property(property: "password", type: "string")
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(response: 200, description: "User logged in"),
+        new OA\Response(response: 401, description: "Invalid credentials")
+    ]
+)]
 
-        $session = $this->requestStack->getSession();
+#[Route('/login', methods: ['POST'])]
+public function login(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
+{
+    $session = $this->requestStack->getSession();
+    $data = json_decode($request->getContent(), true);
 
-        $data = json_decode($request->getContent(), true);
-        $email = $data['email'] ?? '';
-        $password = $data['password'] ?? '';
-
-
-        $user = $this->userRepository->findOneBy(['email' => $email]);
-
-
-        if (!$user || !$passwordHasher->isPasswordValid($user, $password)) {
-            return $this->json(['error' => 'Invalid credentials'], 401);
-        }
-
-
-        $session->set('user', $user->getId());
-
-        return $this->json([
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
-            'name' => $user->getName(),
-            'surname' => $user->getSurname(),
-            'age' => $user->getAge(),
-        ]);
+    if (!isset($data['email'], $data['password'])) {
+        return $this->json(['error' => 'Missing email or password'], 400);
     }
 
+    $email = $data['email'];
+    $password = $data['password'];
+
+    $user = $this->userRepository->findOneBy(['email' => $email]);
+
+    if (!$user || !$passwordHasher->isPasswordValid($user, $password)) {
+        return $this->json(['error' => 'Invalid credentials'], 401);
+    }
+
+    $session->set('user', $user->getId());
+
+    return $this->json([
+        'id' => $user->getId(),
+        'email' => $user->getEmail(),
+        'name' => $user->getName(),
+        'surname' => $user->getSurname(),
+        'age' => $user->getAge(),
+    ], 200);
+}
+
+	#[OA\Post(
+    path: '/api/v1/logout',
+    summary: 'Wylogowanie użytkownika',
+    responses: [
+        new OA\Response(response: 200, description: "Logged out successfully")
+    ]
+	)]
+ 
     #[Route('/logout', methods: ['POST'])]
 	public function logout(Request $request): JsonResponse
 	{
 		$session = $this->requestStack->getSession();
-		$session->remove('user'); // usuwa konkretny klucz z sesji
-		$session->invalidate();   // opcjonalnie: usuwa całą sesję
 
-		return $this->json(['message' => 'Logged out successfully']);
+		if (!$session->has('user')) {
+			return $this->json(['error' => 'No active session'], 401);
+		}
+
+		$session->remove('user');
+		$session->invalidate();
+
+		return $this->json(['message' => 'Logged out successfully'], 200);
+	}
+	
+	#[OA\Get(
+    path: '/api/v1/test',
+    summary: 'Test endpoint',
+    responses: [
+        new OA\Response(response: 200, description: "OK")
+    ]
+	)]
+	#[Route('/api/v1/test', name: 'api_test', methods: ['GET'])]
+	public function test(): JsonResponse
+	{
+		return $this->json(['message' => 'ok']);
 	}
 
-    #[Route('/profile', methods: ['GET'])]
-    public function getProfile(): JsonResponse
-    {
-        $userId = $this->session->get('user');
-
-        if (!$userId) {
-            return $this->json(['error' => 'User not logged in'], 401);
-        }
-
-        $user = $this->userRepository->find($userId);
-
-        if (!$user) {
-            return $this->json(['error' => 'User not found'], 404);
-        }
-
-        return $this->json([
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
-            'name' => $user->getName(),
-            'surname' => $user->getSurname(),
-            'age' => $user->getAge(),
-        ]);
-    }
-
-    #[Route('/users', methods: ['GET'])]
-    public function getUsers(): JsonResponse
-    {
-        $users = $this->userRepository->findAll();
-        $usersArray = array_map(fn(User $user) => [
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
-            'name' => $user->getName(),
-            'surname' => $user->getSurname(),
-            'age' => $user->getAge(),
-        ], $users);
-
-        return $this->json($usersArray);
-    }
 }

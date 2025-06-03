@@ -12,8 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Annotations as OA;
+use OpenApi\Attributes as OA;
 
-#[Route('/api')]
+#[Route('/api/v1')]
 class ReservationController extends AbstractController
 {
     private ReservationRepository $reservationRepository;
@@ -29,6 +32,15 @@ class ReservationController extends AbstractController
         $this->userRepository = $userRepository;
         $this->entityManager = $entityManager;
     }
+	
+	#[OA\Get(
+    path: '/api/v1/reservations',
+    summary: 'Pobranie wszystkich rezerwacji zalogowanego użytkownika',
+    responses: [
+        new OA\Response(response: 200, description: "List of reservations"),
+        new OA\Response(response: 401, description: "Unauthorized")
+    ]
+	)]
 
     #[Route('/reservations', methods: ['GET'])]
     public function getReservations(Request $request): JsonResponse
@@ -41,7 +53,6 @@ class ReservationController extends AbstractController
 		}
 
 		$reservations = $this->reservationRepository->findBy(['user' => $user]);
-		//$reservations = $this->reservationRepository->findAll();
         $data = [];
 
 		foreach ($reservations as $reservation) {
@@ -61,6 +72,33 @@ class ReservationController extends AbstractController
 
 		return $this->json($data);
     }
+
+	#[OA\Post(
+    path: '/api/v1/addReservation',
+    summary: 'Dodanie nowej rezerwacji',
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ["user_id", "name", "location", "frame_size", "theme", "reservation_date", "start_time", "end_time", "bike_type"],
+            type: "object",
+            properties: [
+                new OA\Property(property: "user_id", type: "integer"),
+                new OA\Property(property: "name", type: "string"),
+                new OA\Property(property: "location", type: "string"),
+                new OA\Property(property: "frame_size", type: "string"),
+                new OA\Property(property: "theme", type: "string"),
+                new OA\Property(property: "reservation_date", type: "string", format: "date"),
+                new OA\Property(property: "start_time", type: "string", format: "time"),
+                new OA\Property(property: "end_time", type: "string", format: "time"),
+                new OA\Property(property: "bike_type", type: "string")
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(response: 201, description: "Reservation added"),
+        new OA\Response(response: 404, description: "User not found")
+    ]
+	)]
 
     #[Route('/addReservation', methods: ['POST'])]
     public function addReservation(Request $request): JsonResponse
