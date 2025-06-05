@@ -20,6 +20,24 @@ v
 
 ---
 
+## Konfiguracja backendu
+
+- composer install
+- konfiguracja bazy danych w .env: DATABASE_URL="mysql://user:password@127.0.0.1:3306/rover4me"
+- php bin/console doctrine:database:create
+- php bin/console doctrine:migrations:migrate
+- uruchomienie servera: symfony server:start
+- dokumentacja API dostępna pod: http://localhost:8000/api/doc
+
+---
+
+## Konfiguracja front endu
+
+- W folderze frontend
+- npm install
+- nmp run dev
+- aplikacja dostępna pod adresem: http://localhost:3000
+
 ## 🛠️ Technologie i uzasadnienie
 
 | Technologia | Zastosowanie | Uzasadnienie |

@@ -35,7 +35,7 @@ v
 
 - W folderze frontend
 - npm install
-- nmp run dev
+- npm run dev
 - aplikacja dostępna pod adresem: http://localhost:3000
 
 ## 🛠️ Technologie i uzasadnienie
