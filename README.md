@@ -1,0 +1,56 @@
+# 🚴 Rover4Me
+
+**Rover4Me** to aplikacja webowa umożliwiająca użytkownikom rezerwację rowerów w różnych lokalizacjach. System obsługuje rejestrację, logowanie, przeglądanie oraz tworzenie rezerwacji. Całość oparta jest na architekturze klient-serwer z wykorzystaniem Symfony (PHP) i React (JavaScript).
+
+---
+
+## 🏗️ Architektura
+
+[Frontend - React]
+|
+v
+[REST API - Symfony + API Platform]
+|
+v
+[MySQL Database]
+
+- Frontend komunikuje się z backendem przez REST API.
+- Backend obsługuje logikę biznesową i dostęp do bazy danych.
+- API jest udokumentowane w Swagger UI.
+
+---
+
+## 🛠️ Technologie i uzasadnienie
+
+| Technologia | Zastosowanie | Uzasadnienie |
+|-------------|--------------|--------------|
+| **Symfony** | Backend, REST API | Stabilny framework PHP, wspiera szybki rozwój aplikacji i integrację z bazą danych |
+| **API Platform** | Generowanie i dokumentowanie API | Automatyczne generowanie specyfikacji OpenAPI oraz Swagger UI |
+| **MySQL** | Baza danych | Relacyjna, popularna baza danych, łatwa integracja z Doctrine |
+| **React** | Interfejs użytkownika | Nowoczesny frontend, komponentowa architektura i szybka interakcja |
+| **NelmioApiDocBundle** | Ręczna dokumentacja endpointów | Umożliwia opisywanie niestandardowych tras i parametrów API |
+| **MySQL Workbench** | Wizualizacja bazy danych | Generowanie ERD, zarządzanie strukturą relacyjną |
+
+---
+
+## 🧩 Funkcje aplikacji
+
+- Rejestracja i logowanie użytkownika
+
+- Tworzenie i przeglądanie rezerwacji
+
+- Obsługa błędów (brak autoryzacji, brak zasobów)
+
+- Dokumentacja API w Swagger UI
+
+- Generowany ERD bazy danych
+
+---
+
+## 📊 ERD
+- Diagram ERD znajduje się w pliku docs/ERD.png.
+
+---
+
+## ✍️ Autor
+- Maciej Pilarski – pełen stack, dokumentacja, integracja API
