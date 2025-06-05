@@ -2,7 +2,7 @@ nelmio_api_doc:
     documentation:
         info:
             title: Rover4Me
-            description: Opis funkcjonalności aplikacji
+            description: Aplikacja do wypożycznia rowerów!
             version: 1.0.0
     areas: # to filter documented areas
         path_patterns:

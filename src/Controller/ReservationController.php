@@ -69,7 +69,7 @@ class ReservationController extends AbstractController
 			];
 		}
 
-		return $this->json($data);
+		return $this->json($data, 200);
     }
 
 	#[OA\Post(
@@ -123,6 +123,6 @@ class ReservationController extends AbstractController
         $this->entityManager->persist($reservation);
         $this->entityManager->flush();
 
-        return $this->json(['message' => 'Reservation added']);
+        return $this->json(['message' => 'Reservation added'], 201);
     }
 }

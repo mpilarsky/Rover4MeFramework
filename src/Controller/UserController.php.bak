@@ -47,7 +47,7 @@ class UserController extends AbstractController
     ),
     responses: [
         new OA\Response(response: 201, description: "User registered successfully"),
-        new OA\Response(response: 400, description: "Missing required fields or email already in use")
+        new OA\Response(response: 400, description: "Missing required fields or email already in use"),
     ]
 	)]
 
@@ -76,7 +76,7 @@ class UserController extends AbstractController
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        return $this->json(['message' => 'User registered successfully']);
+        return $this->json(['message' => 'User registered successfully'], 201);
     }
 
 #[OA\Post(
@@ -133,7 +133,8 @@ public function login(Request $request, UserPasswordHasherInterface $passwordHas
     path: '/api/v1/logout',
     summary: 'Wylogowanie użytkownika',
     responses: [
-        new OA\Response(response: 200, description: "Logged out successfully")
+        new OA\Response(response: 200, description: "Logged out successfully"),
+		new OA\Response(response: 401, description: "No active session")
     ]
 	)]
  
@@ -159,7 +160,7 @@ public function login(Request $request, UserPasswordHasherInterface $passwordHas
         new OA\Response(response: 200, description: "OK")
     ]
 	)]
-	#[Route('/api/v1/test', name: 'api_test', methods: ['GET'])]
+	#[Route('/test', name: 'api_test', methods: ['GET'])]
 	public function test(): JsonResponse
 	{
 		return $this->json(['message' => 'ok']);
